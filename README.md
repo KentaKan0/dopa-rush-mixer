@@ -2,6 +2,10 @@
 
 Windows デスクトップに常駐できる、アプリケーションごとの音量ミキサーです。再生中のアプリごとに音量変更とミュート切り替えを行えます。
 
+## プレビュー
+<img width="200" height="400" alt="image" src="https://github.com/user-attachments/assets/a36fc115-c2fd-4d0a-8d19-60f667f6a0f9" />
+
+
 ## 必要環境
 
 - Windows 10 / 11
