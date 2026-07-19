@@ -8,6 +8,9 @@ bin/
 obj/
 artifacts/
 
+# Local agent workflow and private notes
+docs/private/
+
 # Tooling, editor, and OS files
 .vs/
 .vscode/

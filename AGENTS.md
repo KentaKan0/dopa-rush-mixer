@@ -3,18 +3,13 @@
 ## 公開リポジトリの方針
 
 - このリポジトリはソースコードのみを公開し、`UNLICENSE` で提供する。バイナリ、生成物、個人設定、秘密情報は含めない。
-- 外部からの Pull Request は受け付けない。変更はリポジトリ所有者の明示的な依頼に基づいて行う。
 - 新しいライブラリ、画像、アイコン、フォントを追加する前に、出所とライセンスを確認する。依存関係を追加・更新した場合はライセンス状況も確認する。
 - Vivaldi 連携、localhost ブリッジ、拡張機能権限に変更がある場合は、`README.md` と `docs/security-and-privacy.md` を同時に更新する。
 
-## Git と公開フロー
+## ローカル運用の上書き
 
-1. 作業前に `git status --short --branch` と `git fetch origin main` を実行し、`origin/main` を確認する。
-2. 未コミット変更または取り込み不能なリモート変更がある場合は、上書きせずに所有者へ確認する。
-3. 変更後は公開対象に生成物、`.env`、資格情報、ローカルデータが含まれないことを確認する。
-4. コミット前に `git diff --check` を実行し、コミットの Author と Committer が `KentaKan0 <71116092+KentaKan0@users.noreply.github.com>` であることを確認する。
-5. `main` への push は所有者が明示的に依頼した場合だけ行う。履歴の書き換えや force-push は、対象・理由・影響を示して明示承認を得た場合だけ `--force-with-lease` を使う。
-6. 公開後の著者確認は Contributors 一覧ではなく、GitHub の個別コミットに表示される Author と Committer を正とする。
+- `docs/private/agent-workflow.md` が存在する場合は、このファイルの後に読み込む。このローカル専用ファイルには、Gitリモート、コミット著者、push承認など、環境・所有者固有の運用を記載できる。
+- `docs/private/` は公開対象に含めない。
 
 ## 実装と検証
 
@@ -28,4 +23,3 @@
 
 - 利用者に見える機能、必要環境、制約、権限、保存データが変わる場合は `README.md` を更新する。
 - Vivaldi 連携の扱う情報やローカル通信の前提が変わる場合は `docs/security-and-privacy.md` を更新する。
-- 外部PRを受け付けない方針は `CONTRIBUTING.md` と Pull Request テンプレートを正とする。
