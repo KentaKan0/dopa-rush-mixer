@@ -1,0 +1,20 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# .NET build and validation output
+bin/
+obj/
+artifacts/
+
+# Tooling, editor, and OS files
+.vs/
+.vscode/
+.idea/
+TestResults/
+*.user
+*.suo
+*.swp
+.DS_Store
+Thumbs.db

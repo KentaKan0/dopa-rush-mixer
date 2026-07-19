@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "DopaRush Mixer Bridge",
+  "version": "1.0.0",
+  "description": "Registers Vivaldi tabs for individual volume control in DopaRush Mixer.",
+  "permissions": ["offscreen", "tabCapture", "tabs"],
+  "host_permissions": ["http://127.0.0.1:32145/*"],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Register this tab with DopaRush Mixer"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      }
+    }
+  }
+}
