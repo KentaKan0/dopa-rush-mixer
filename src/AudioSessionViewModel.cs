@@ -5,9 +5,9 @@ namespace DopaRushMixer;
 
 public sealed class AudioSessionViewModel : INotifyPropertyChanged, IDisposable
 {
-    private readonly IAudioSessionControl? sessionControl;
-    private readonly ISimpleAudioVolume? volumeControl;
-    private readonly IAudioMeterInformation? meterControl;
+    private IAudioSessionControl? sessionControl;
+    private ISimpleAudioVolume? volumeControl;
+    private IAudioMeterInformation? meterControl;
     private float volume;
     private bool isMuted;
     private double peakTargetPercent;
@@ -26,10 +26,10 @@ public sealed class AudioSessionViewModel : INotifyPropertyChanged, IDisposable
         this.isMuted = isMuted;
     }
 
-    public string SessionKey { get; }
-    public string ProcessName { get; }
+    public string SessionKey { get; private set; }
+    public string ProcessName { get; private set; }
     public string AppIdentity => string.Equals(ProcessName, "Unknown", StringComparison.OrdinalIgnoreCase) ? Name : ProcessName;
-    public ImageSource? AppIcon { get; }
+    public ImageSource? AppIcon { get; private set; }
     public string Name { get; private set; }
     public string Detail { get; private set; }
     public double Volume { get => Math.Round(volume * 100); set { volume = (float)(value / 100); OnPropertyChanged(); OnPropertyChanged(nameof(VolumeText)); } }
@@ -60,6 +60,25 @@ public sealed class AudioSessionViewModel : INotifyPropertyChanged, IDisposable
         OnPropertyChanged(nameof(Detail));
     }
 
+    internal void Rebind(AudioSessionViewModel activeSession)
+    {
+        ReleaseSessionControl();
+        SessionKey = activeSession.SessionKey;
+        ProcessName = activeSession.ProcessName;
+        AppIcon = activeSession.AppIcon;
+        sessionControl = activeSession.sessionControl;
+        volumeControl = activeSession.volumeControl;
+        meterControl = activeSession.meterControl;
+        activeSession.sessionControl = null;
+        activeSession.volumeControl = null;
+        activeSession.meterControl = null;
+        Update(activeSession.Name, activeSession.Detail, activeSession.volume, activeSession.isMuted);
+        OnPropertyChanged(nameof(SessionKey));
+        OnPropertyChanged(nameof(ProcessName));
+        OnPropertyChanged(nameof(AppIdentity));
+        OnPropertyChanged(nameof(AppIcon));
+    }
+
     public void UpdatePeak()
     {
         if (meterControl is null) return;
@@ -81,7 +100,16 @@ public sealed class AudioSessionViewModel : INotifyPropertyChanged, IDisposable
 
     public void Dispose()
     {
-        if (sessionControl is not null) System.Runtime.InteropServices.Marshal.ReleaseComObject(sessionControl);
+        ReleaseSessionControl();
+    }
+
+    private void ReleaseSessionControl()
+    {
+        if (sessionControl is null) return;
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(sessionControl);
+        sessionControl = null;
+        volumeControl = null;
+        meterControl = null;
     }
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
