@@ -163,7 +163,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else if (existingByAppIdentity.TryGetValue(session.AppIdentity, out retained))
             {
-                retained.Update(session.Name, session.Detail, (float)(session.Volume / 100), session.IsMuted);
+                retained.Rebind(session);
                 session.Dispose();
             }
             else if (pendingSessionCandidates.TryGetValue(session.AppIdentity, out var firstSeenAt) && DateTime.UtcNow - firstSeenAt >= TimeSpan.FromSeconds(2))
