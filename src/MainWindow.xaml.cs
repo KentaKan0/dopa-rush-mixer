@@ -8,12 +8,16 @@ namespace DopaRushMixer;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
+    private const double InactiveOpacity = 0.5;
+    private static readonly TimeSpan InactiveDelay = TimeSpan.FromSeconds(10);
     private readonly AudioSessionService audioSessions = new();
     private readonly VivaldiBridgeService vivaldiBridge = new();
     private readonly OutputDeviceHistory outputDeviceHistory = new();
     private readonly DispatcherTimer refreshTimer;
     private readonly DispatcherTimer meterTimer;
     private readonly DispatcherTimer meterRenderTimer;
+    private readonly DispatcherTimer inactiveTimer;
+    private bool isInactiveOpacityEnabled = true;
     private bool hasSessions;
     private bool isRefreshing;
     private bool isInteracting;
@@ -86,6 +90,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         meterTimer.Tick += (_, _) => UpdateMeters();
         meterRenderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         meterRenderTimer.Tick += (_, _) => AnimateMeters();
+        inactiveTimer = new DispatcherTimer { Interval = InactiveDelay };
+        inactiveTimer.Tick += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            if (isInactiveOpacityEnabled && !IsActive) Opacity = InactiveOpacity;
+        };
+        Activated += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            Opacity = 1;
+        };
+        Deactivated += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            if (isInactiveOpacityEnabled) inactiveTimer.Start();
+        };
         Loaded += (_, _) =>
         {
             vivaldiBridge.TabsChanged += VivaldiTabsChanged;
@@ -94,12 +114,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             refreshTimer.Start();
             meterTimer.Start();
             meterRenderTimer.Start();
+            if (isInactiveOpacityEnabled && !IsActive) inactiveTimer.Start();
         };
         Closed += (_, _) =>
         {
             refreshTimer.Stop();
             meterTimer.Stop();
             meterRenderTimer.Stop();
+            inactiveTimer.Stop();
             vivaldiBridge.TabsChanged -= VivaldiTabsChanged;
             vivaldiBridge.Dispose();
             foreach (var session in Sessions) session.Dispose();
@@ -312,6 +334,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool IsInputHeld() =>
         isInteracting || DateTime.UtcNow < inputHoldUntilUtc || Keyboard.FocusedElement is Slider or ToggleButton;
+
+    private void InactiveOpacityChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem) return;
+        isInactiveOpacityEnabled = menuItem.IsChecked;
+        inactiveTimer.Stop();
+        Opacity = 1;
+        if (isInactiveOpacityEnabled && !IsActive) inactiveTimer.Start();
+    }
 
     private void TopmostChanged(object sender, RoutedEventArgs e) =>
         Topmost = sender switch

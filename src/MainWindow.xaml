@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{Binding WindowTitle}" Icon="Assets/DopaRushMixer.ico" Width="460" Height="860" MinWidth="360" MinHeight="520"
         Topmost="True" ShowInTaskbar="True" Background="#FF171717" Foreground="#FFE5E5E5"
-        WindowStyle="None" ResizeMode="CanResizeWithGrip">
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip">
   <Window.Resources>
     <Style x:Key="SectionLabel" TargetType="TextBlock">
       <Setter Property="Foreground" Value="#FFB8B8B8" />
@@ -85,6 +85,7 @@
           <ContextMenu>
             <MenuItem Header="更新" Click="RefreshClicked" />
             <MenuItem Header="常に手前" IsCheckable="True" IsChecked="True" Checked="TopmostChanged" Unchecked="TopmostChanged" />
+            <MenuItem Header="非アクティブ時に半透明化" IsCheckable="True" IsChecked="True" Click="InactiveOpacityChanged" />
             <Separator />
             <MenuItem Header="最小化" Click="MinimizeClicked" />
             <MenuItem Header="閉じる" Click="CloseClicked" />
