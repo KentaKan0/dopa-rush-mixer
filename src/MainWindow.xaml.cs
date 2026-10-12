@@ -8,12 +8,15 @@ namespace DopaRushMixer;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
+    private const double InactiveOpacity = 0.5;
+    private static readonly TimeSpan InactiveDelay = TimeSpan.FromSeconds(10);
     private readonly AudioSessionService audioSessions = new();
     private readonly VivaldiBridgeService vivaldiBridge = new();
     private readonly OutputDeviceHistory outputDeviceHistory = new();
     private readonly DispatcherTimer refreshTimer;
     private readonly DispatcherTimer meterTimer;
     private readonly DispatcherTimer meterRenderTimer;
+    private readonly DispatcherTimer inactiveTimer;
     private bool hasSessions;
     private bool isRefreshing;
     private bool isInteracting;
@@ -86,6 +89,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         meterTimer.Tick += (_, _) => UpdateMeters();
         meterRenderTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         meterRenderTimer.Tick += (_, _) => AnimateMeters();
+        inactiveTimer = new DispatcherTimer { Interval = InactiveDelay };
+        inactiveTimer.Tick += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            if (!IsActive) Opacity = InactiveOpacity;
+        };
+        Activated += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            Opacity = 1;
+        };
+        Deactivated += (_, _) =>
+        {
+            inactiveTimer.Stop();
+            inactiveTimer.Start();
+        };
         Loaded += (_, _) =>
         {
             vivaldiBridge.TabsChanged += VivaldiTabsChanged;
@@ -94,12 +113,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             refreshTimer.Start();
             meterTimer.Start();
             meterRenderTimer.Start();
+            if (!IsActive) inactiveTimer.Start();
         };
         Closed += (_, _) =>
         {
             refreshTimer.Stop();
             meterTimer.Stop();
             meterRenderTimer.Stop();
+            inactiveTimer.Stop();
             vivaldiBridge.TabsChanged -= VivaldiTabsChanged;
             vivaldiBridge.Dispose();
             foreach (var session in Sessions) session.Dispose();
