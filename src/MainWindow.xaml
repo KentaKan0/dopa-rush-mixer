@@ -85,6 +85,7 @@
           <ContextMenu>
             <MenuItem Header="更新" Click="RefreshClicked" />
             <MenuItem Header="常に手前" IsCheckable="True" IsChecked="True" Checked="TopmostChanged" Unchecked="TopmostChanged" />
+            <MenuItem Header="非アクティブ時に半透明化" IsCheckable="True" IsChecked="True" Click="InactiveOpacityChanged" />
             <Separator />
             <MenuItem Header="最小化" Click="MinimizeClicked" />
             <MenuItem Header="閉じる" Click="CloseClicked" />
